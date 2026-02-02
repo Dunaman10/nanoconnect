@@ -1,0 +1,17 @@
+{
+  "name": "nanoconnect",
+  "version": "1.0.0",
+  "description": "Nanoconnect is an influencer marketing platform",
+  "build": {
+    "command" : "npm install && npm run build",
+    "output": "dist"
+  },
+  "functions": {
+    "directory": "functions",
+    "runtime": "nodejs"
+  },
+  "caches": {
+    "source": "/images/*",
+    "cacheTtl": 86400
+  }
+}
