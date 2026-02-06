@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ServiceCard from '../components/ServiceCard';
-import { supabase } from '../lib/supabase';
 
 const Home = () => {
   const [stats, setStats] = useState([
@@ -10,11 +9,9 @@ const Home = () => {
     { label: 'Kampanye Sukses', value: '0', loading: true },
     { label: 'Rata-rata ROI', value: '300%', loading: false },
   ]);
-  const [testimonials, setTestimonials] = useState([]);
-  const [testimonialsLoading, setTestimonialsLoading] = useState(true);
-
-  // Fallback testimonials if none in database
-  const fallbackTestimonials = [
+  
+  // Static testimonials data
+  const testimonials = [
     {
       name: 'Rina Handayani',
       role: 'Owner Toko Kue Mama',
@@ -46,90 +43,58 @@ const Home = () => {
     return num.toString() + '+';
   };
 
-  // Fetch stats from Supabase
+  // Fetch stats from Edge Function cache
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Fetch nano creators count (users with user_type = 'influencer')
-        const { count: creatorsCount, error: creatorsError } = await supabase
-          .from('users')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_type', 'influencer');
+        const response = await fetch('https://nanoconnect.edgeone.dev/stat-cache');
+        const data = await response.json();
 
-        // Fetch UMKM count (users with user_type = 'sme')
-        const { count: umkmCount, error: umkmError } = await supabase
-          .from('users')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_type', 'sme');
-
+        if (data && data.total_influencers !== undefined) {
+          setStats([
+            { 
+              label: 'Nano Creators', 
+              value: formatNumber(data.total_influencers || 0), 
+              loading: false 
+            },
+            { 
+              label: 'UMKM Terdaftar', 
+              value: formatNumber(data.total_umkm || 0), 
+              loading: false 
+            },
+            { 
+              label: 'Kampanye Sukses', 
+              value: formatNumber(data.total_campaigns || 0), 
+              loading: false 
+            },
+            { 
+              label: 'Rata-rata ROI', 
+              value: `${data.average_roi || 300}%`, 
+              loading: false 
+            },
+          ]);
+        } else {
+          // Fallback jika data tidak tersedia
+          setStats([
+            { label: 'Nano Creators', value: '10K+', loading: false },
+            { label: 'UMKM Terdaftar', value: '5K+', loading: false },
+            { label: 'Kampanye Sukses', value: '25K+', loading: false },
+            { label: 'Rata-rata ROI', value: '300%', loading: false },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        // Fallback jika error
         setStats([
-          { 
-            label: 'Nano Creators', 
-            value: creatorsError ? '0' : formatNumber(creatorsCount || 0), 
-            loading: false 
-          },
-          { 
-            label: 'UMKM Terdaftar', 
-            value: umkmError ? '0' : formatNumber(umkmCount || 0), 
-            loading: false 
-          },
+          { label: 'Nano Creators', value: '10K+', loading: false },
+          { label: 'UMKM Terdaftar', value: '5K+', loading: false },
           { label: 'Kampanye Sukses', value: '25K+', loading: false },
           { label: 'Rata-rata ROI', value: '300%', loading: false },
         ]);
-      } catch (error) {
-        console.error('Error fetching stats:', error);
       }
     };
 
     fetchStats();
-  }, []);
-
-  // Fetch testimonials from Supabase
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('reviews')
-          .select(`
-            id,
-            rating,
-            comment,
-            created_at,
-            reviewer:users!reviews_reviewer_id_fkey (
-              name,
-              avatar_url,
-              business_name
-            )
-          `)
-          .eq('is_public', true)
-          .order('rating', { ascending: false })
-          .limit(3);
-
-        if (error) {
-          console.error('Error fetching testimonials:', error);
-          // Use fallback testimonials if error
-          setTestimonials(fallbackTestimonials);
-        } else if (data && data.length > 0) {
-          setTestimonials(data.map(review => ({
-            name: review.reviewer?.name || 'Anonymous',
-            role: review.reviewer?.business_name || 'UMKM Owner',
-            avatar: review.reviewer?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.reviewer?.name || 'user'}`,
-            content: review.comment,
-            rating: review.rating || 5,
-          })));
-        } else {
-          // Use fallback if no testimonials
-          setTestimonials(fallbackTestimonials);
-        }
-      } catch (error) {
-        console.error('Error fetching testimonials:', error);
-        setTestimonials(fallbackTestimonials);
-      } finally {
-        setTestimonialsLoading(false);
-      }
-    };
-
-    fetchTestimonials();
   }, []);
 
   const features = [
@@ -371,58 +336,34 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonialsLoading ? (
-              // Loading skeleton
-              [...Array(3)].map((_, index) => (
-                <div key={index} className="card p-6 animate-pulse">
-                  <div className="flex space-x-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={i} className="w-5 h-5 bg-white/20 rounded"></div>
-                    ))}
-                  </div>
-                  <div className="space-y-2 mb-6">
-                    <div className="h-4 bg-white/20 rounded w-full"></div>
-                    <div className="h-4 bg-white/20 rounded w-3/4"></div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-full"></div>
-                    <div>
-                      <div className="h-4 bg-white/20 rounded w-24 mb-2"></div>
-                      <div className="h-3 bg-white/10 rounded w-16"></div>
-                    </div>
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="card p-6">
+                {/* Stars */}
+                <div className="flex space-x-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+
+                {/* Content */}
+                <p className="text-white/80 mb-6 italic">"{testimonial.content}"</p>
+
+                {/* Author */}
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full"
+                  />
+                  <div>
+                    <p className="font-semibold text-white">{testimonial.name}</p>
+                    <p className="text-sm text-white/60">{testimonial.role}</p>
                   </div>
                 </div>
-              ))
-            ) : (
-              testimonials.map((testimonial, index) => (
-                <div key={index} className="card p-6">
-                  {/* Stars */}
-                  <div className="flex space-x-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <svg key={i} className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-
-                  {/* Content */}
-                  <p className="text-white/80 mb-6 italic">"{testimonial.content}"</p>
-
-                  {/* Author */}
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full"
-                    />
-                    <div>
-                      <p className="font-semibold text-white">{testimonial.name}</p>
-                      <p className="text-sm text-white/60">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
