@@ -1,0 +1,21 @@
+{
+  "routes": [
+    {
+      "routePath": "/helloworld-edge",
+      "mountPath": "/",
+      "method": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS"
+      ],
+      "module": [
+        "edge-functions/helloworld-edge/index.js:onRequest"
+      ]
+    }
+  ],
+  "middleware": null
+}

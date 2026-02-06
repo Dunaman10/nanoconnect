@@ -1,0 +1,53 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/ai-recommendation",
+      "mountPath": "/api",
+      "method": [
+        "POST",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/api\\ai-recommendation\\index.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/api/ai-recommendations",
+      "mountPath": "/api",
+      "method": [
+        "POST",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/api\\ai-recommendations\\index.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/api/order",
+      "mountPath": "/api",
+      "method": [
+        "POST",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/api\\order\\index.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/helloworld-cloud",
+      "mountPath": "/",
+      "method": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/helloworld-cloud\\index.js:onRequest"
+      ]
+    }
+  ]
+}

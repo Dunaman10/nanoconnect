@@ -236,12 +236,20 @@ ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own profile" ON users
     FOR SELECT USING (auth.uid() = id OR is_active = TRUE);
 
+-- Policy: Authenticated users can create their own profile
+CREATE POLICY "Users can insert own profile" ON users
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
 CREATE POLICY "Users can update own profile" ON users
     FOR UPDATE USING (auth.uid() = id);
 
 -- Policy: Public bisa lihat influencer yang available
 CREATE POLICY "Anyone can view available influencers" ON influencers
     FOR SELECT USING (is_available = TRUE);
+
+-- Policy: Authenticated users can create their own influencer profile
+CREATE POLICY "Influencer can insert own profile" ON influencers
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Influencer can update own profile" ON influencers
     FOR UPDATE USING (auth.uid() = user_id);

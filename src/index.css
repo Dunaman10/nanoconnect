@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors - Primary (Indigo) */
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+
+  /* Colors - Accent (Emerald) */
+  --color-accent-50: #ecfdf5;
+  --color-accent-100: #d1fae5;
+  --color-accent-200: #a7f3d0;
+  --color-accent-300: #6ee7b7;
+  --color-accent-400: #34d399;
+  --color-accent-500: #10b981;
+  --color-accent-600: #059669;
+  --color-accent-700: #047857;
+  --color-accent-800: #065f46;
+  --color-accent-900: #064e3b;
+
+  /* Animations */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-gradient: gradient 8s ease infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
+
+/* Custom Base Styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @apply antialiased bg-slate-900 text-white;
+  }
+}
+
+/* Custom Utilities */
+@utility gradient-text {
+  @apply bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent;
+}
+
+@utility text-shadow {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+@utility gradient-primary {
+  background-image: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+}
+
+@utility gradient-dark {
+  background-image: linear-gradient(135deg, #1e1b4b 0%, #064e3b 100%);
+}
+
+/* Custom Component Classes */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl font-semibold text-white 
+           hover:from-primary-600 hover:to-accent-600 transform hover:scale-105 transition-all duration-300
+           shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 border-2 border-white/20 rounded-xl font-semibold text-white 
+           hover:bg-white/10 backdrop-blur-sm transition-all duration-300;
+  }
+  
+  .card {
+    @apply bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 
+           hover:border-white/20 transition-all duration-300;
+  }
+  
+  .card-hover {
+    @apply hover:transform hover:-translate-y-2 hover:shadow-2xl;
+  }
+  
+  .glass {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl 
+           focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 
+           outline-none transition-all duration-300 text-white placeholder-white/50;
+  }
+  
+  /* Style for select elements */
+  select.input-field {
+    @apply cursor-pointer appearance-none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+  
+  /* Style for select options - dark theme */
+  select.input-field option {
+    background-color: #1e293b;
+    color: #fff;
+    padding: 0.5rem;
+  }
+  
+  select.input-field option:hover,
+  select.input-field option:focus,
+  select.input-field option:checked {
+    background-color: #6366f1;
+    color: #fff;
+  }
+  
+  .section-padding {
+    @apply py-20 px-4 md:px-8 lg:px-16;
+  }
+  
+  .container-custom {
+    @apply max-w-7xl mx-auto;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1b4b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #6366f1, #10b981);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #4f46e5, #059669);
+}

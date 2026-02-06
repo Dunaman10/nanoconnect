@@ -1,17 +1,58 @@
 {
   "name": "nanoconnect",
   "version": "1.0.0",
-  "description": "Nanoconnect is an influencer marketing platform",
+  "description": "NanoConnect - Platform Nano Influencer Marketing untuk UMKM Indonesia",
   "build": {
-    "command" : "npm install && npm run build",
+    "command": "npm install && npm run build",
     "output": "dist"
   },
+  "routes": [
+    {
+      "path": "/api/*",
+      "function": "functions"
+    },
+    {
+      "path": "/*",
+      "static": "dist"
+    }
+  ],
   "functions": {
     "directory": "functions",
     "runtime": "nodejs"
   },
-  "caches": {
-    "source": "/images/*",
-    "cacheTtl": 86400
-  }
+  "caches": [
+    {
+      "source": "/assets/*",
+      "cacheTtl": 31536000
+    },
+    {
+      "source": "/images/*",
+      "cacheTtl": 86400
+    },
+    {
+      "source": "/*.js",
+      "cacheTtl": 604800
+    },
+    {
+      "source": "/*.css",
+      "cacheTtl": 604800
+    }
+  ],
+  "headers": [
+    {
+      "source": "/*",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+      }
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "statusCode": 301
+    }
+  ]
 }
