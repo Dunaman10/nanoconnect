@@ -1,179 +1,95 @@
 # 🚀 NanoConnect
 
-Platform penghubung **Nano Creator** (1K-20K followers) dengan **UMKM** untuk iklan yang terjangkau dan efektif.
+Platform inovatif yang menghubungkan **UMKM** dengan **Nano Creator** (1K-20K followers) untuk pemasaran digital yang lebih terjangkau, autentik, dan efektif.
 
-![NanoConnect Banner](https://via.placeholder.com/1200x400/1e1b4b/ffffff?text=NanoConnect+-+Influencer+Marketing+untuk+UMKM)
+![NanoConnect Homepage](docs/homepage-screenshot.png)
 
-## ✨ Features
+> **Catatan:** Program ini adalah hasil karya submisi untuk **Devhandal 2026**, sebuah program beasiswa coding dari **Codepolitan** yang berkolaborasi dengan **Tencent EdgeOne**.
 
-- **🎯 Smart Matching Engine** - Algoritma cerdas mencocokkan UMKM dengan influencer yang tepat
-- **💬 Chat Influencer** - Komunikasi langsung dengan nano creator
-- **📦 Order Layanan** - Sistem pemesanan yang mudah dan aman
-- **💳 Multiple Payment** - Berbagai metode pembayaran tersedia
-- **⭐ Review & Rating** - Sistem transparansi untuk kepuasan bersama
-- **📊 Analytics Dashboard** - Pantau performa kampanye secara real-time
+---
 
-## 🛠️ Tech Stack
+## 🎯 Tentang Project
 
-| Category | Technology |
-|----------|------------|
-| Frontend | React 18 + Vite |
-| Styling | Tailwind CSS |
-| Routing | React Router v6 |
-| Database | Supabase (PostgreSQL) |
-| Backend | EdgeOne Functions |
-| Icons | Heroicons (SVG) |
-| Fonts | Google Fonts (Inter) |
+**NanoConnect** dibangun untuk memecahkan masalah mahalnya biaya pemasaran influencer bagi UMKM dan sulitnya nano creator mendapatkan klien.
 
-## 💰 Kategori Layanan
+Dengan platform ini:
+- **UMKM** dapat menjangkau audiens lokal dengan budget minim namun _engagement_ tinggi.
+- **Nano Creator** mendapatkan wadah untuk memonewtisasi konten sosial media mereka secara profesional.
+- **Ekosistem Digital** menjadi lebih inklusif bagi pelaku bisnis kecil.
 
-| Layanan | Harga |
-|---------|-------|
-| UGC Content Creation | Rp 10K - 50K |
-| Product Review | Rp 20K - 100K |
-| Story Takeover | Rp 5K - 25K |
-| Event Coverage | Rp 50K - 200K |
-| Affiliate Program | Commission-based |
+## 🛠️ Teknologi yang Digunakan
 
-## 📁 Project Structure
+Aplikasi ini dibangun menggunakan teknologi web modern untuk performa tinggi dan skalabilitas (SEO-friendly & Edge-ready).
 
-```
-nanoconnect/
-├── public/                 # Static assets
-│   └── favicon.svg
-├── src/
-│   ├── components/         # Reusable components
-│   │   ├── Navbar.jsx
-│   │   ├── Footer.jsx
-│   │   ├── InfluencerCard.jsx
-│   │   └── ServiceCard.jsx
-│   ├── pages/              # Page components
-│   │   ├── Home.jsx
-│   │   ├── About.jsx
-│   │   ├── Influencers.jsx
-│   │   ├── InfluencerDetail.jsx
-│   │   ├── Chat.jsx
-│   │   ├── Order.jsx
-│   │   ├── Terms.jsx
-│   │   └── Privacy.jsx
-│   ├── lib/                # Utilities & configs
-│   │   └── supabase.js
-│   ├── App.jsx             # Main app with routing
-│   ├── main.jsx            # Entry point
-│   └── index.css           # Global styles
-├── functions/              # EdgeOne serverless functions
-│   └── api.js
-├── edgeone.json            # EdgeOne deployment config
-├── tailwind.config.js      # Tailwind configuration
-├── postcss.config.js       # PostCSS configuration
-├── vite.config.js          # Vite configuration
-├── nanoconnect_database.sql # Database schema for Supabase
-└── package.json
-```
+| Kategori | Teknologi | Deskripsi |
+|----------|------------|-----------|
+| **Frontend** | React 18 + Vite | UI Library modern yang cepat dan ringan |
+| **Styling** | Tailwind CSS | Framework CSS utility-first untuk desain responsif & cantik |
+| **Routing** | React Router v6 | Manajemen navigasi halaman SPA |
+| **Database** | Supabase | Backend-as-a-Service berbasis PostgreSQL |
+| **Backend** | EdgeOne Functions | Serverless computing untuk performa rendah latensi |
+| **Iconography** | Heroicons | Set ikon SVG yang bersih dan modern |
+| **Font** | Google Fonts (Inter) | Tipografi yang mudah dibaca |
 
-## 🚀 Getting Started
+## 🚀 Cara Install dan Menjalankan di Local
 
-### Prerequisites
+Ikuti langkah-langkah berikut untuk menjalankan project ini di komputer Anda:
 
-- Node.js 18+ 
-- npm or yarn
-- Supabase account (for database)
+### Prasyarat
+- **Node.js** (versi 18 atau terbaru)
+- **npm** atau **yarn**
+- Akun **Supabase** (untuk database)
 
-### Installation
+### Langkah-langkah
 
-1. **Clone the repository**
+1. **Clone Repository**
+   Buka terminal dan jalankan perintah:
    ```bash
    git clone https://github.com/Dunaman10/nanoconnect.git
    cd nanoconnect
    ```
 
-2. **Install dependencies**
+2. **Install Dependencies**
+   Download semua library yang dibutuhkan:
    ```bash
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Konfigurasi Environment Variable**
+   Duplikat file contoh konfigurasi:
    ```bash
    cp .env.example .env
    ```
-   Then edit `.env` with your Supabase credentials:
-   ```
-   VITE_SUPABASE_URL=your_supabase_project_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   Buka file `.env` dan isi kredensial Supabase Anda:
+   ```env
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
    ```
 
-4. **Set up the database**
-   - Go to Supabase Dashboard → SQL Editor
-   - Run the `nanoconnect_database.sql` script
+4. **Setup Database**
+   - Login ke dashboard Supabase Anda.
+   - Buka menu **SQL Editor**.
+   - Copy isi file `nanoconnect_database.sql` yang ada di root folder project ini.
+   - Paste dan jalankan (Run) query tersebut untuk membuat tabel yang dibutuhkan.
 
-5. **Start development server**
+5. **Jalankan Development Server**
    ```bash
    npm run dev
    ```
-   Open http://localhost:5173 in your browser.
+   Buka browser dan akses alamat yang muncul (biasanya `http://localhost:5173`).
 
-### Build for Production
+## ✨ Fitur Unggulan
 
-```bash
-npm run build
-```
-
-The build output will be in the `dist/` folder.
-
-## 🌐 Deployment (EdgeOne)
-
-This project is configured for EdgeOne deployment:
-
-```bash
-# Build the project
-npm run build
-
-# Deploy to EdgeOne (follow EdgeOne CLI instructions)
-edgeone deploy
-```
-
-## 📱 Pages
-
-| Page | Route | Description |
-|------|-------|-------------|
-| Homepage | `/` | Landing page dengan hero dan fitur unggulan |
-| About | `/about` | Tentang platform dan tim |
-| Influencers | `/influencers` | Daftar nano creator dengan filter |
-| Influencer Detail | `/influencer/:id` | Profil lengkap, portfolio, dan layanan |
-| Chat | `/chat/:id` | Real-time messaging dengan influencer |
-| Order | `/order/:id` | Form pemesanan layanan |
-| Terms | `/terms` | Syarat dan ketentuan |
-| Privacy | `/privacy` | Kebijakan privasi |
-
-## 🎨 Design System
-
-- **Colors**: Gradient primary (Indigo `#6366f1` → Green `#10b981`)
-- **Background**: Dark slate (`#0f172a`, `#1e1b4b`)
-- **Typography**: Inter font family
-- **Components**: Glassmorphism with subtle borders
-- **Animations**: Float, pulse, gradient animations
-- **Responsive**: Mobile-first approach
-
-## 🔒 Security Features
-
-- ✅ SSL/TLS encryption
-- ✅ Secure payment processing (Escrow system)
-- ✅ Row Level Security (RLS) in Supabase
-- ✅ Input validation
-- ✅ CORS protection
-
-## 📧 Contact
-
-- **Email**: hello@nanoconnect.id
-- **Phone**: 0812-3456-7890
-- **Location**: Jakarta, Indonesia
-
-## 📄 License
-
-© 2026 NanoConnect. All rights reserved.
+- **Smart Matching Engine**: Mencocokkan UMKM dengan influencer berdasarkan niche dan budget secara otomatis.
+- **Real-time Analytics**: Dashboard untuk memantau performa kampanye (Reach, Engagement, ROI).
+- **Secure Escrow Payment**: Sistem pembayaran yang menahan dana hingga pekerjaan selesai untuk keamanan kedua belah pihak.
+- **Chat System**: Fitur pesan instan untuk negosiasi langsung antara UMKM dan Creator.
+- **Edge Computing**: Komputasi di _edge_ menggunakan Tencent EdgeOne untuk respon aplikasi yang super cepat.
 
 ---
 
 <p align="center">
-  Made with ❤️ in Indonesia
+  Dibuat dengan ❤️ untuk kemajuan UMKM Indonesia
+  <br>
+  © 2026 NanoConnect
 </p>
