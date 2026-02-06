@@ -42,6 +42,164 @@ if (!Symbol.for('nodejs.util.promisify.custom')) {
 }
 
 
+  
+  
+// ===== Fetch Proxy Injection (Production Mode Only) =====
+// Inject fetch-proxy to intercept fetch calls
+import __fetchProxyCrypto from 'node:crypto';
+
+(function() {
+  const __originalFetch = globalThis.fetch;
+
+const uuid = '{{PAGES_PROXY_UUID}}';
+const proxyHost = '{{PAGES_PROXY_HOST}}';
+
+function _fetch(
+  request,
+  requestInit = {},
+) {
+  const { host } = getUrl(request);
+  const cache = getHostCache(host);
+  if (cache && cache.needProxy && cache.expires > Date.now()) {
+    setHostCache(host);
+    return fetchByProxy(request, requestInit);
+  }
+  return fetchByOrigin(request, requestInit);
+}
+
+function getUrl(request) {
+  // 直接从 request.url 获取 URL，避免消费 request body
+  const urlString = request instanceof Request ? request.url : request;
+  return new URL(urlString);
+}
+
+function getHostCache(host) {
+  return new Map(globalThis._FETCHCACHES || []).get(host);
+}
+
+function setHostCache(host) {
+  const value = {
+    needProxy: true,
+    expires: Date.now() + 1000 * 60 * 60,
+  };
+  if (globalThis._FETCHCACHES) {
+    globalThis._FETCHCACHES.set(host, value);
+  } else {
+    const cache = new Map([[host, value]]);
+    Object.defineProperty(globalThis, '_FETCHCACHES', {
+      value: cache,
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
+  }
+}
+
+function bufferToHex(arr) {
+  return Array.prototype.map
+    .call(arr, (x) => (x >= 16 ? x.toString(16) : '0' + x.toString(16)))
+    .join('');
+}
+
+function generateSign({ pathname, oeTimestamp }) {
+  return md5(oeTimestamp+'-'+pathname+'-'+uuid);
+}
+
+async function generateHeaders(request) {
+  const { host, pathname } = getUrl(request);
+  const timestamp = Date.now().toString();
+  const sign = generateSign({ pathname, oeTimestamp: timestamp });
+  return {
+    host,
+    timestamp,
+    sign,
+  };
+}
+
+// MD5 hash function for Node.js environment
+// Node.js crypto.subtle.digest doesn't support MD5, so we use crypto.createHash instead
+// Note: __fetchProxyCrypto is imported at the top level using ESM import
+function md5(text) {
+  const hash = __fetchProxyCrypto.createHash('md5');
+  hash.update(text, 'utf8');
+  return hash.digest('hex');
+}
+
+/**
+ * Try to request using the native fetch; if it fails, request via the proxy
+ * @returns
+ */
+async function fetchByOrigin(
+  request,
+  requestInit = {},
+) {
+  try {
+    const res = await __originalFetch(request, {
+      eo: {
+        timeoutSetting: {
+          connectTimeout: 500,
+        },
+      },
+      ...requestInit,
+    });
+    if (res.status > 300 || res.status < 200) throw new Error('need proxy');
+    return res;
+  } catch (error) {
+    const { host } = getUrl(request);
+    setHostCache(host);
+    return fetchByProxy(request, requestInit);
+  }
+}
+
+/**
+ * Request via AI proxy
+ * @returns
+ */
+async function fetchByProxy(
+  request,
+  requestInit,
+) {
+  const options = {};
+  if (requestInit) {
+    Object.assign(options, requestInit || {});
+  }
+  options.headers = new Headers(options.headers || {});
+  const { host, timestamp, sign } = await generateHeaders(request);
+  options.headers.append('oe-host', host);
+  options.headers.append('oe-timestamp', timestamp);
+  options.headers.append('oe-sign', sign);
+  
+  let clonedRequest;
+  if (request instanceof Request && typeof request.clone === 'function') {
+    clonedRequest = request.clone();
+  } else {
+    // If request is not a Request object (e.g., URL string), create a new Request
+    clonedRequest = new Request(request);
+  }
+  
+  // Create a new request with the proxy host, preserving all properties including body
+  const req = new Request(clonedRequest.url.replace(host, proxyHost), {
+    method: clonedRequest.method,
+    headers: clonedRequest.headers,
+    body: clonedRequest.body,
+  });
+  
+  return __originalFetch(req, options);
+}
+// Replace global fetch with _fetch from fetch-proxy
+  if (typeof _fetch === 'function') {
+    globalThis.fetch = _fetch;
+    // Store original fetch for internal use
+    globalThis.__originalFetch = __originalFetch;
+  } else {
+    console.warn('[runtime-shim] _fetch function not found, using original fetch');
+  }
+})();
+
+
+  
+
+
 var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -5548,6 +5706,14 @@ var require_ws = __commonJS({
 // <stdin>
 import http from "http";
 var env = {
+  "NG_CLI_ANALYTICS": "false",
+  "NUXT_TELEMETRY_DISABLED": "1",
+  "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0",
+  "COREPACK_ENABLE_STRICT": "0",
+  "YARN_ENABLE_INTERACTIVE": "0",
+  "NPM_CONFIG_YES": "true",
+  "CI": "true",
+  "TMPDIR": "C:\\Users\\SYARIF~1\\AppData\\Local\\Temp",
   "VITE_SUPABASE_URL": "https://gpjprlcpdizkqcutfwvi.supabase.co",
   "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwanBybGNwZGl6a3FjdXRmd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMjc4MzQsImV4cCI6MjA4NTYwMzgzNH0.RGTCGx1Vm4DlIJyljpEXffgeKG7w5b8PS-9v2J5RsvM",
   "VITE_APP_NAME": "NanoConnect",

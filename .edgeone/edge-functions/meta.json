@@ -15,6 +15,18 @@
       "module": [
         "edge-functions/helloworld-edge/index.js:onRequest"
       ]
+    },
+    {
+      "routePath": "/stat-cache",
+      "mountPath": "/",
+      "method": [
+        "GET",
+        "POST"
+      ],
+      "module": [
+        "edge-functions/stat-cache/index.js:onRequestGet",
+        "edge-functions/stat-cache/index.js:onRequestPost"
+      ]
     }
   ],
   "middleware": null

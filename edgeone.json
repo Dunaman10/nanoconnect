@@ -8,6 +8,10 @@
   },
   "routes": [
     {
+      "path": "/stat-cache",
+      "function": "edge-functions/stat-cache"
+    },
+    {
       "path": "/api/*",
       "function": "functions"
     },
@@ -41,11 +45,11 @@
   "headers": [
     {
       "source": "/*",
-      "headers": {
-        "X-Frame-Options": "DENY",
-        "X-Content-Type-Options": "nosniff",
-        "Referrer-Policy": "strict-origin-when-cross-origin"
-      }
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
     }
   ],
   "redirects": [

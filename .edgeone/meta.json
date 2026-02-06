@@ -1,0 +1,132 @@
+{
+  "conf": {
+    "headers": [
+      {
+        "source": "/*",
+        "headers": [
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/home",
+        "destination": "/",
+        "statusCode": 301
+      }
+    ],
+    "rewrites": [],
+    "caches": [
+      {
+        "source": "/assets/*",
+        "cacheTtl": 31536000
+      },
+      {
+        "source": "/images/*",
+        "cacheTtl": 86400
+      },
+      {
+        "source": "/*.js",
+        "cacheTtl": 604800
+      },
+      {
+        "source": "/*.css",
+        "cacheTtl": 604800
+      }
+    ],
+    "has404": false
+  },
+  "has404": false,
+  "nodeFunctionsRoutes": [
+    {
+      "routePath": "/api/ai-recommendation",
+      "mountPath": "/api",
+      "method": [
+        "POST",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/api\\ai-recommendation\\index.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/api/ai-recommendations",
+      "mountPath": "/api",
+      "method": [
+        "POST",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/api\\ai-recommendations\\index.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/api/order",
+      "mountPath": "/api",
+      "method": [
+        "POST",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/api\\order\\index.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/helloworld-cloud",
+      "mountPath": "/",
+      "method": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS"
+      ],
+      "module": [
+        "node-functions/helloworld-cloud\\index.js:onRequest"
+      ]
+    }
+  ],
+  "edgeFunctionsRoutes": [
+    {
+      "routePath": "/helloworld-edge",
+      "mountPath": "/",
+      "method": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS"
+      ],
+      "module": [
+        "edge-functions/helloworld-edge/index.js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/stat-cache",
+      "mountPath": "/",
+      "method": [
+        "GET",
+        "POST"
+      ],
+      "module": [
+        "edge-functions/stat-cache/index.js:onRequestGet",
+        "edge-functions/stat-cache/index.js:onRequestPost"
+      ]
+    }
+  ]
+}
