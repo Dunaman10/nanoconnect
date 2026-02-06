@@ -126,10 +126,6 @@
       }
 
       
-      async function executeMiddleware(context) {
-        return null; // 没有中间件，继续执行后续函数
-      }
-    
 
       async function handleRequest(context){
         let routeParams = {};
@@ -371,99 +367,7 @@
         };
       
 
-        
-        const runMiddleware = typeof executeMiddleware !== 'undefined' ? executeMiddleware : async function() { return null; };
-        let middlewareResponseHeaders = null; // 保存中间件设置的响应头
-        const middlewareResponse = await runMiddleware({
-          request,
-          urlInfo: new URL(urlInfo.toString()),
-          env: {"NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"C:\\Users\\SYARIF~1\\AppData\\Local\\Temp","VITE_SUPABASE_URL":"https://gpjprlcpdizkqcutfwvi.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwanBybGNwZGl6a3FjdXRmd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMjc4MzQsImV4cCI6MjA4NTYwMzgzNH0.RGTCGx1Vm4DlIJyljpEXffgeKG7w5b8PS-9v2J5RsvM","VITE_APP_NAME":"NanoConnect","VITE_APP_URL":"http://localhost:5173"},
-          waitUntil
-        });
-
-        if (middlewareResponse) {
-          const headers = middlewareResponse.headers;
-          const hasNext = headers && headers.get('x-middleware-next') === '1';
-          const rewriteTarget = headers && headers.get('x-middleware-rewrite');
-          const requestHeadersOverride = headers && headers.get('x-middleware-request-headers');
-          // Next.js 使用 x-middleware-override-headers 传递需要修改的请求头列表
-          const overrideHeadersList = headers && headers.get('x-middleware-override-headers');
-
-          if (rewriteTarget) {
-            try {
-              const rewrittenUrl = rewriteTarget.startsWith('http://') || rewriteTarget.startsWith('https://')
-                ? rewriteTarget
-                : new URL(rewriteTarget, urlInfo.origin).toString();
-              request = recreateRequest(request, { url: rewrittenUrl });
-              urlInfo = new URL(rewrittenUrl);
-              normalizePathname();
-            } catch (rewriteError) {
-              console.error('Middleware rewrite error:', rewriteError);
-            }
-          }
-
-          // 处理 Next.js 的 x-middleware-override-headers 机制
-          if (overrideHeadersList) {
-            try {
-              const headerPatch = {};
-              const overrideKeys = overrideHeadersList.split(',').map(k => k.trim());
-              for (const key of overrideKeys) {
-                const newValue = headers.get('x-middleware-request-' + key);
-                if (newValue !== null) {
-                  headerPatch[key] = newValue;
-                }
-              }
-              if (Object.keys(headerPatch).length > 0) {
-                request = recreateRequest(request, { headerPatches: headerPatch });
-              }
-            } catch (overrideError) {
-              console.error('Middleware override headers error:', overrideError);
-            }
-          }
-          // 处理旧的 x-middleware-request-headers 机制（兼容）
-          else if (requestHeadersOverride) {
-            try {
-              const decoded = decodeURIComponent(requestHeadersOverride);
-              const headerPatch = JSON.parse(decoded);
-              request = recreateRequest(request, { headerPatches: headerPatch });
-            } catch (requestPatchError) {
-              console.error('Middleware request header override error:', requestPatchError);
-            }
-          }
-
-          if (!hasNext && !rewriteTarget) {
-            return middlewareResponse;
-          }
-
-          if (hasNext) {
-            middlewareResponseHeaders = new Headers();
-            const skipHeaders = new Set([
-              'x-middleware-next',
-              'x-middleware-rewrite',
-              'x-middleware-request-headers',
-              'x-middleware-override-headers',
-              'x-middleware-set-cookie',
-              'date',
-              'connection',
-              'content-length',
-              'transfer-encoding',
-              'set-cookie', // Set-Cookie 需要特殊处理，避免重复
-            ]);
-            headers.forEach((value, key) => {
-              const lowerKey = key.toLowerCase();
-              // 过滤内部使用的 header：skipHeaders 中的 + x-middleware-request-* 前缀的请求头修改标记
-              if (!skipHeaders.has(lowerKey) && !lowerKey.startsWith('x-middleware-request-')) {
-                middlewareResponseHeaders.set(key, value);
-              }
-            });
-            // 特殊处理 Set-Cookie，可能有多个，使用 getSetCookie 获取完整的 cookie 值
-            const setCookies = headers.getSetCookie ? headers.getSetCookie() : [];
-            setCookies.forEach(cookie => {
-              middlewareResponseHeaders.append('Set-Cookie', cookie);
-            });
-          }
-        }
-      
+        let middlewareResponseHeaders = null;
         
         // 走到这里说明：
         // 1. 没有中间件响应（middlewareResponse 为 null/undefined）
@@ -537,7 +441,7 @@
           }
           
         }
-        const edgeFunctionResponse = await pagesFunctionResponse({request, params, env: {"NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"C:\\Users\\SYARIF~1\\AppData\\Local\\Temp","VITE_SUPABASE_URL":"https://gpjprlcpdizkqcutfwvi.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwanBybGNwZGl6a3FjdXRmd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMjc4MzQsImV4cCI6MjA4NTYwMzgzNH0.RGTCGx1Vm4DlIJyljpEXffgeKG7w5b8PS-9v2J5RsvM","VITE_APP_NAME":"NanoConnect","VITE_APP_URL":"http://localhost:5173"}, waitUntil, eo });
+        const edgeFunctionResponse = await pagesFunctionResponse({request, params, env: {"VITE_SUPABASE_URL":"https://gpjprlcpdizkqcutfwvi.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwanBybGNwZGl6a3FjdXRmd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMjc4MzQsImV4cCI6MjA4NTYwMzgzNH0.RGTCGx1Vm4DlIJyljpEXffgeKG7w5b8PS-9v2J5RsvM","VITE_APP_NAME":"NanoConnect","VITE_APP_URL":"http://localhost:5173"}, waitUntil, eo });
         
         // 如果中间件设置了响应头，合并到边缘函数响应中
         if (middlewareResponseHeaders && edgeFunctionResponse) {
@@ -561,4 +465,4 @@
         
         return edgeFunctionResponse;
       }
-      addEventListener('fetch', event=>{return event.respondWith(handleRequest({request:event.request,params: {}, env: {"NG_CLI_ANALYTICS":"false","NUXT_TELEMETRY_DISABLED":"1","COREPACK_ENABLE_DOWNLOAD_PROMPT":"0","COREPACK_ENABLE_STRICT":"0","YARN_ENABLE_INTERACTIVE":"0","NPM_CONFIG_YES":"true","CI":"true","TMPDIR":"C:\\Users\\SYARIF~1\\AppData\\Local\\Temp","VITE_SUPABASE_URL":"https://gpjprlcpdizkqcutfwvi.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwanBybGNwZGl6a3FjdXRmd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMjc4MzQsImV4cCI6MjA4NTYwMzgzNH0.RGTCGx1Vm4DlIJyljpEXffgeKG7w5b8PS-9v2J5RsvM","VITE_APP_NAME":"NanoConnect","VITE_APP_URL":"http://localhost:5173"}, waitUntil: event.waitUntil }))});
+      addEventListener('fetch', event=>{return event.respondWith(handleRequest({request:event.request,params: {}, env: {"VITE_SUPABASE_URL":"https://gpjprlcpdizkqcutfwvi.supabase.co","VITE_SUPABASE_ANON_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwanBybGNwZGl6a3FjdXRmd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMjc4MzQsImV4cCI6MjA4NTYwMzgzNH0.RGTCGx1Vm4DlIJyljpEXffgeKG7w5b8PS-9v2J5RsvM","VITE_APP_NAME":"NanoConnect","VITE_APP_URL":"http://localhost:5173"}, waitUntil: event.waitUntil }))});
