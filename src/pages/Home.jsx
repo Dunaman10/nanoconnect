@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import ServiceCard from '../components/ServiceCard';
 
 const Home = () => {
+  // Start with fallback values, not "0"
   const [stats, setStats] = useState([
-    { label: 'Nano Creators', value: '0', loading: true },
-    { label: 'UMKM Terdaftar', value: '0', loading: true },
-    { label: 'Kampanye Sukses', value: '0', loading: true },
+    { label: 'Nano Creators', value: '10K+', loading: true },
+    { label: 'UMKM Terdaftar', value: '5K+', loading: true },
+    { label: 'Kampanye Sukses', value: '25K+', loading: true },
     { label: 'Rata-rata ROI', value: '300%', loading: false },
   ]);
   
@@ -37,6 +38,7 @@ const Home = () => {
 
   // Format number with K+ suffix
   const formatNumber = (num) => {
+    if (!num || num === 0) return '0+';
     if (num >= 1000) {
       return (num / 1000).toFixed(num >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'K+';
     }
@@ -47,50 +49,55 @@ const Home = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('https://nanoconnect.edgeone.dev/stat-cache');
+        const response = await fetch('https://nanoconnect.edgeone.dev/stat-cache', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('Stats data received:', data);
 
-        if (data && data.total_influencers !== undefined) {
+        // Check if data has the expected fields (could be direct or nested)
+        const statsData = data.data || data; // Handle both wrapped and unwrapped response
+        
+        if (statsData && typeof statsData.total_influencers === 'number') {
           setStats([
             { 
               label: 'Nano Creators', 
-              value: formatNumber(data.total_influencers || 0), 
+              value: formatNumber(statsData.total_influencers), 
               loading: false 
             },
             { 
               label: 'UMKM Terdaftar', 
-              value: formatNumber(data.total_umkm || 0), 
+              value: formatNumber(statsData.total_umkm), 
               loading: false 
             },
             { 
               label: 'Kampanye Sukses', 
-              value: formatNumber(data.total_campaigns || 0), 
+              value: formatNumber(statsData.total_campaigns), 
               loading: false 
             },
             { 
               label: 'Rata-rata ROI', 
-              value: `${data.average_roi || 300}%`, 
+              value: `${statsData.average_roi || 300}%`, 
               loading: false 
             },
           ]);
         } else {
-          // Fallback jika data tidak tersedia
-          setStats([
-            { label: 'Nano Creators', value: '10K+', loading: false },
-            { label: 'UMKM Terdaftar', value: '5K+', loading: false },
-            { label: 'Kampanye Sukses', value: '25K+', loading: false },
-            { label: 'Rata-rata ROI', value: '300%', loading: false },
-          ]);
+          // Data format not recognized, use fallback
+          console.log('Data format not recognized, using fallback');
+          setStats(prev => prev.map(s => ({ ...s, loading: false })));
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
-        // Fallback jika error
-        setStats([
-          { label: 'Nano Creators', value: '10K+', loading: false },
-          { label: 'UMKM Terdaftar', value: '5K+', loading: false },
-          { label: 'Kampanye Sukses', value: '25K+', loading: false },
-          { label: 'Rata-rata ROI', value: '300%', loading: false },
-        ]);
+        // Keep fallback values but set loading to false
+        setStats(prev => prev.map(s => ({ ...s, loading: false })));
       }
     };
 
